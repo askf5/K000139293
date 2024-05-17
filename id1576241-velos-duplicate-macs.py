@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 # v1.0 - 2024-05-16 - initial version
+# v1.1 - 2024-05-17 - suppressed spurious SSH stderr
 
 from collections import namedtuple
 from itertools import combinations
@@ -66,11 +67,16 @@ def partition_cmd(cmd: str, partition: int):
         # prepend an "ssh <other controller>" to the command to run
         command = [
             "ssh",
+            "-o",
+            "BatchMode yes",
             # Sigh
             "-o",
             "UserKnownHostsFile /dev/null",
             "-o",
             "StrictHostKeyChecking no",
+            # Suppress banner and Warning: Permanently added '...' (ECDSA) to the list of known hosts.
+            "-o",
+            "LogLevel error",
             f"controller-{partition_controller}.chassis.local",
             *command,
         ]
